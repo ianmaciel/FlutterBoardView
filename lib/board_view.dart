@@ -19,6 +19,7 @@ class BoardView extends StatefulWidget {
   final int dragDelay;
   final Function(bool)? itemInMiddleWidget;
   final OnDropBottomWidget? onDropItemInMiddleWidget;
+  final bool isBacklog;
 
   const BoardView({
     Key? key,
@@ -33,6 +34,7 @@ class BoardView extends StatefulWidget {
     this.width = 280,
     this.middleWidget,
     this.bottomPadding,
+    this.isBacklog = false,
   }) : super(key: key);
 
   bool get isNotSelecting => !isSelecting;
@@ -371,10 +373,13 @@ class BoardViewState extends State<BoardView>
         }
       });
     }
+
+    // ListView of BoardList
     Widget listWidget = ListView.builder(
       physics: const ClampingScrollPhysics(),
       itemCount: widget.lists!.length,
-      scrollDirection: Axis.horizontal,
+      // Place BoarList in top of each other when is in backlog mode.
+      scrollDirection: widget.isBacklog ? Axis.vertical : Axis.horizontal,
       controller: boardViewController,
       itemBuilder: (BuildContext context, int index) {
         if (widget.lists![index].boardView == null) {
@@ -413,6 +418,8 @@ class BoardViewState extends State<BoardView>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize:
+                  widget.isBacklog ? MainAxisSize.min : MainAxisSize.max,
               children: <Widget>[Expanded(child: widget.lists![index])],
             ));
         if (draggedListIndex == index && draggedItemIndex == null) {
